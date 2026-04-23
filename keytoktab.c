@@ -74,7 +74,17 @@ static tab keywordtab[ ] = {
 /**********************************************************************/
 void p_toktab()
 {
-    printf("\n *** TO BE DONE");
+    //Skriver ut Token-tabell
+    printf("\n *** Tokentable");
+    for (int i = 0; tokentab[i].token != nfound; i++) {
+        printf(" %s\t%d\n", tokentab[i].text, tokentab[i].token);
+    }
+
+    //skriver ut Nyckelord-tabell
+    printf("\n *** Keywordtable");
+    for (int i = 0; keywordtab[i].token != nfound; i++) {
+        printf(" %s\t%d\n", keywordtab[i].text, keywordtab[i].token);
+    }
 }
 
 /**********************************************************************/
@@ -82,15 +92,33 @@ void p_toktab()
 /**********************************************************************/
 toktyp lex2tok(char * fplex)
 {
-    printf("\n *** TO BE DONE");  return 0;
+    //Går igenom taken-tabellen från början
+    for (int i = 0; tokentab[i].token != nfound; i++) {
+        
+        //Jämför ordet med texten i tabellen
+        if (strcmp(fplex, tokentab[i].text) == 0) {
+            
+            // Ingen skillnad, returnera tokenet.
+            return tokentab[i].token;
+        }
+    }
+    printf("\n *** Error", fplex);  return 0;
 }
 
 /**********************************************************************/
 /* key2tok - convert a keyword to a token                             */
 /**********************************************************************/
 toktyp key2tok(char * fplex)
-{
-    printf("\n *** TO BE DONE");  return 0;
+{   //Gå igenom keyword tabellen från början
+    for (int i = 0; keywordtab[i].token != nfound; i++)
+    
+    //jämför ordet med texten i tabellen
+    if (strcmp(fplex, keywordtab[i].text) == 0) {
+
+        //Ingen skillnad, returnera tokenet.
+        return keywordtab[i].token;
+    }
+    printf("\n *** Error");  return 0;
 }
 
 /**********************************************************************/
@@ -98,7 +126,23 @@ toktyp key2tok(char * fplex)
 /**********************************************************************/
 char * tok2lex(toktyp ftok)
 {
-    printf("\n *** TO BE DONE");  return 0;
+    //Leta igenom token tabellen.
+    for (int i = 0; tokentab[i].token != nfound; i++)
+        if (tokentab[i].token == ftok) {
+
+            //Hittat, returnera texten.
+            return tokentab[i].text;
+        }
+    
+        //leta vidare i keyword tabellen.
+    for (int i = 0; keywordtab[i].token != nfound; i++){
+        if (keywordtab[i].token == ftok) {
+
+            //Hittat, returnera text.
+            return keywordtab[i].text;
+        }
+    }
+    printf("\n *** ERROR");  return 0;
 }
 
 /**********************************************************************/
