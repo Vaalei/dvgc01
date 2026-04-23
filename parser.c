@@ -12,7 +12,7 @@
 /**********************************************************************/
 /* Other OBJECT's METHODS (IMPORTED)                                  */
 /**********************************************************************/
-/* #include "keytoktab.h"   */       /* when the keytoktab is added   */
+#include "keytoktab.h"          /* when the keytoktab is added   */
 /* #include "lexer.h"       */       /* when the lexer     is added   */
 /* #include "symtab.h"      */       /* when the symtab    is added   */
 /* #include "optab.h"       */       /* when the optab     is added   */
@@ -24,12 +24,31 @@
 static int  lookahead=0;
 static int  is_parse_ok=1;
 
+static void prog(void);
+static void program_header(void);
+static void var_part(void);
+static void var_dec_list(void);
+static void var_dec(void);
+static void id_list(void);
+static void type(void);
+static void stat_part(void);
+static void stat_list(void);
+static void stat(void);
+static void assign_stat(void);
+static void expr(void);
+static void term(void);
+static void factor(void);
+static void operand(void);
+
+
+
 /**********************************************************************/
 /* RAPID PROTOTYPING - simulate the token stream & lexer (get_token)  */
 /**********************************************************************/
 /* define tokens + keywords NB: remove this when keytoktab.h is added */
 /**********************************************************************/
-enum tvalues { program = 257, id, input, output };
+/* enum tvalues { program = 257, id, input, output, var, boolean, integer,*/
+/*	real, begin, end, number };*/
 /**********************************************************************/
 /* Simulate the token stream for a given program                      */
 /**********************************************************************/
@@ -74,12 +93,165 @@ static void match(int t)
 /**********************************************************************/
 /* The grammar functions                                              */
 /**********************************************************************/
+
+static void prog()
+{
+	in("prog");
+	program_header();
+	var_part();
+	stat_part();
+	out("prog");
+}
+
 static void program_header()
 {
     in("program_header");
     match(program); match(id); match('('); match(input);
     match(','); match(output); match(')'); match(';');
     out("program_header");
+}
+
+
+static void var_part()
+{
+	in("var_part");
+	match(var);
+	var_dec_list();
+	out("var_part");	
+}
+
+static void var_dec_list()
+{
+	in("var_dec_list");
+	var_dec();
+	if(lookahead == id)
+	{
+		var_dec_list();	
+	}
+	out("var");
+}
+
+static void var_dec()
+{
+	in("var_dec");
+	id_list(); match(":"); type(); match(";");
+	out("var_dec");
+}
+
+static void id_list()
+{
+	in("id_list");
+	match("id");
+	if(lookahead == ",")
+	{
+		match(",");
+		id_list();
+	}
+	out("id_list");
+}
+
+static void type()
+{
+	in("type");
+	switch(lookahead)
+		{
+		case integer:
+			match(integer);
+			break;
+		case boolean:
+			match(boolean);
+			break;
+		case real:
+			match(real);
+			break;
+		}
+	out("type");
+}
+
+static void stat_part()
+{
+	in("stat_part");
+	match(begin);
+	stat_list();
+	match(end);
+	match(".");
+	out("stat_part");
+}
+
+static void stat_list()
+{
+	in("stat_list");
+	stat();
+	if(lookahead == ";")
+	{
+		match(";");
+		stat_list();
+	}
+	out("stat_list");
+}	
+
+static void stat()
+{
+	in("stat");
+	assign_stat();
+	out("stat");
+}
+
+static void assign_stat()
+{
+	in("assign_stat");
+	match(id); match(assign); expr();
+	out("assign_stat");
+}
+
+static void expr()
+{
+    in("expr");
+    term();
+    if (lookahead == '+')
+    {
+        match('+');
+        expr();
+    }
+    out("expr");
+}
+
+static void term()
+{
+    in("term");
+    factor();
+    if (lookahead == '*')
+    {
+        match('*');
+        term();
+    }
+    out("term");
+}
+
+static void factor()
+{
+    in("factor");
+    if (lookahead == '(')
+    {
+        match('(');
+        expr();
+        match(')');
+    }
+    else
+    {
+        operand();
+    }
+    out("factor");
+}
+
+static void operand()
+{
+    in("operand");
+    if (lookahead == id)
+        match(id);
+    else
+        match(number);
+    out("operand");
 }
 
 /**********************************************************************/
