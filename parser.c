@@ -134,17 +134,17 @@ static void var_dec_list()
 static void var_dec()
 {
 	in("var_dec");
-	id_list(); match(":"); type(); match(";");
+	id_list(); match(':'); type(); match(';');
 	out("var_dec");
 }
 
 static void id_list()
 {
 	in("id_list");
-	match("id");
-	if(lookahead == ",")
+	match(id);
+	if(lookahead == ',')
 	{
-		match(",");
+		match(',');
 		id_list();
 	}
 	out("id_list");
@@ -174,7 +174,7 @@ static void stat_part()
 	match(begin);
 	stat_list();
 	match(end);
-	match(".");
+	match('.');
 	out("stat_part");
 }
 
@@ -182,9 +182,9 @@ static void stat_list()
 {
 	in("stat_list");
 	stat();
-	if(lookahead == ";")
+	if(lookahead == ';')
 	{
-		match(";");
+		match(';');
 		stat_list();
 	}
 	out("stat_list");
