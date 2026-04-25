@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdbool.h>
 
 /**********************************************************************/
 /* Other OBJECT's METHODS (IMPORTED)                                  */
@@ -25,7 +26,7 @@ static int  pbuf  = 0;               /* current index program buffer  */
 static int  plex  = 0;               /* current index lexeme  buffer  */
 
 /**********************************************************************/
-/*  PRIVATE METHODS for this OBJECT  (using "static" in C)            */
+/* PRIVATE METHODS for this OBJECT  (using "static" in C)            */
 /**********************************************************************/
 /**********************************************************************/
 /* buffer functions                                                   */
@@ -36,7 +37,12 @@ static int  plex  = 0;               /* current index lexeme  buffer  */
 
 static void get_prog()
 {
-    printf("\n *** TO BE DONE");
+    int temp;
+    while((temp = fgetc(stdin)) != EOF && pbuf < BUFSIZE - 1) {
+        buffer[pbuf++] = (char)temp;
+    }
+    buffer[pbuf] = '\0';
+    pbuf = 0;
 }
 
 /**********************************************************************/
@@ -45,7 +51,18 @@ static void get_prog()
 
 static void pbuffer()
 {
-    printf("\n *** TO BE DONE");
+    printf("________________________________________________________ \n");
+    printf(" THE PROGRAM TEXT\n");
+    printf("________________________________________________________ \n");
+    
+    printf("%s", buffer);
+    
+    if (strlen(buffer) > 0 && buffer[strlen(buffer) - 1] != '\n') {
+        printf("\n");
+    }
+    printf("$\n");
+    
+    printf("________________________________________________________ \n");
 }
 
 /**********************************************************************/
@@ -54,7 +71,9 @@ static void pbuffer()
 
 static void get_char()
 {
-    printf("\n *** TO BE DONE");
+    if(plex < LEXSIZE - 1 && pbuf < BUFSIZE) {
+        lexbuf[plex++] = buffer[pbuf++];
+    }
 }
 
 /**********************************************************************/
@@ -62,14 +81,52 @@ static void get_char()
 /**********************************************************************/
 
 /**********************************************************************/
-/*  PUBLIC METHODS for this OBJECT  (EXPORTED)                        */
+/* PUBLIC METHODS for this OBJECT  (EXPORTED)                        */
 /**********************************************************************/
 /**********************************************************************/
 /* Return a token                                                     */
 /**********************************************************************/
 int get_token()
 {
-    printf("\n *** TO BE DONE"); return 0;
+    static int first_run = 1;
+    if(first_run) {
+        get_prog();
+        pbuffer();
+        first_run = 0;
+    }
+    
+    plex = 0;
+    memset(lexbuf, 0, sizeof(lexbuf));
+    
+    while(isspace(buffer[pbuf])) {
+        pbuf++;
+    }
+
+    if(buffer[pbuf] == '\0' || buffer[pbuf] == '$') {
+        lexbuf[0] = '$';
+        lexbuf[1] = '\0';
+        return lex2tok(lexbuf); 
+    }
+    
+    if (isalpha(buffer[pbuf])) {
+        while (isalnum(buffer[pbuf])){
+            get_char();
+        }
+    }
+    else if(isdigit(buffer[pbuf])) {
+        while (isdigit(buffer[pbuf])) {
+            get_char();
+        }
+    }
+    else if (buffer[pbuf] == ':' && buffer[pbuf + 1] == '=') {
+        get_char();
+        get_char();
+    }
+    else {
+        get_char();
+    }
+
+    return lex2tok(lexbuf); 
 }
 
 /**********************************************************************/
@@ -77,7 +134,7 @@ int get_token()
 /**********************************************************************/
 char * get_lexeme()
 {
-    printf("\n *** TO BE DONE"); return "$";
+    return lexbuf;
 }
 
 /**********************************************************************/
