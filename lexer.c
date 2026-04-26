@@ -1,3 +1,4 @@
+// Vilhelm Törmänen och Mohammed Jaber
 /**********************************************************************/
 /* lab 1 DVG C01 - Lexer OBJECT                                       */
 /**********************************************************************/
@@ -124,6 +125,10 @@ int get_token()
     }
     else {
         get_char();
+    }
+
+    if(isdigit((unsigned char)lexbuf[0])) {
+        return number;
     }
 
     return lex2tok(lexbuf); 
