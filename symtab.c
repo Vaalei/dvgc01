@@ -36,6 +36,7 @@ static int startp =0;                  /* start position program in ST*/
 /**********************************************************************/
 /*  PRIVATE METHODS for this OBJECT  (using "static" in C)            */
 /**********************************************************************/
+int find_name(char * fpname);
 /**********************************************************************/
 /*  GET methods (one for each attribute)                              */
 /**********************************************************************/
@@ -142,6 +143,10 @@ void addp_name(char * fpname)
 /**********************************************************************/
 void addv_name(char * fpname)
 {
+    if (find_name(fpname)) {
+        printf("\n *** Semantic: Identifier already exists: %s", fpname);
+        return;
+    }
 	addrow(fpname, var, undef, 0, 0);
 }
 

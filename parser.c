@@ -200,7 +200,12 @@ static void stat()
 static void assign_stat()
 {
 	in("assign_stat");
-	match(id); match(assign); expr();
+    toktyp type = get_ntype(get_lexeme());
+	match(id); match(assign); 
+    toktyp expr_type = expr();
+    if (type != expr_type)
+        printf("*** Semantic: Assigned type is not similar: %s = %s", 
+                tok2lex(type), tok2lex(expr_type));
 	out("assign_stat");
 }
 
