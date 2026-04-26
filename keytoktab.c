@@ -1,3 +1,5 @@
+// Vilhelm Törmänen och Mohammed Jaber
+
 /**********************************************************************/
 /* lab 1 DVG C01 - Driver OBJECT                                      */
 /**********************************************************************/
@@ -74,17 +76,21 @@ static tab keywordtab[ ] = {
 /**********************************************************************/
 void p_toktab()
 {
-    //Skriver ut Token-tabell
-    printf("\n *** Tokentable ***\n");
-    for (int i = 0; tokentab[i].token != nfound; i++) {
-        printf(" %s\t%d\n", tokentab[i].text, tokentab[i].token);
-    }
-
     //skriver ut keyword-tabell
-    printf("\n *** Keywordtable ***\n");
+    printf("\n *** THE PROGRAM KEYWORDS ***\n");
     for (int i = 0; keywordtab[i].token != nfound; i++) {
-        printf(" %s\t%d\n", keywordtab[i].text, keywordtab[i].token);
+        printf(" %10s  %d\n", keywordtab[i].text, keywordtab[i].token);
     }
+    printf("\n\n"); 
+
+
+    //Skriver ut Token-tabell
+    printf("\n\n *** THE PROGRAM TOKENS ***\n");
+    for (int i = 0; tokentab[i].token != nfound; i++) {
+        printf(" %10s  %d\n", tokentab[i].text, tokentab[i].token);
+    }
+    printf("\n");
+    
 }
 
 /**********************************************************************/
@@ -112,8 +118,9 @@ toktyp lex2tok(char * fplex)
             return keywordtab[i].token;
         }
     }
-    return 258;
-    //printf("\n *** Error: %s\n", fplex);  return 0;
+
+    return id;
+    
 }
 
 /**********************************************************************/
@@ -124,13 +131,12 @@ toktyp key2tok(char * fplex)
     for (int i = 0; keywordtab[i].token != nfound; i++)
     
     //jämför ordet med texten i keywordtabellen
-    if (strcmp(fplex, keywordtab[i].text) == 0) {
+    if (strcmp(keywordtab[i].text,fplex ) == 0) {
 
         //Ingen skillnad, returnera tokenet.
         return keywordtab[i].token;
     }
-    return 258;
-   // printf("\n *** Error: %s\n", fplex);  return 0;
+    return id;
 }
 
 /**********************************************************************/
@@ -154,8 +160,8 @@ char * tok2lex(toktyp ftok)
             return keywordtab[i].text;
         }
     }
-    return NULL;
-    //printf("\n *** ERROR");  return 0;
+    return "undefined";
+
 }
 
 /**********************************************************************/
