@@ -26,21 +26,21 @@
 static int  lookahead=0;
 static int  is_parse_ok=1;
 
-static void prog(void);
-static void program_header(void);
-static void var_part(void);
-static void var_dec_list(void);
-static void var_dec(void);
-static void id_list(void);
-static void type(void);
-static void stat_part(void);
-static void stat_list(void);
-static void stat(void);
-static void assign_stat(void);
-static void expr(void);
-static void term(void);
-static void factor(void);
-static void operand(void);
+static void prog();
+static void program_header();
+static void var_part();
+static void var_dec_list();
+static void var_dec();
+static void id_list();
+static void type();
+static void stat_part();
+static void stat_list();
+static void stat();
+static void assign_stat();
+static toktyp expr();
+static toktyp term();
+static toktyp factor();
+static toktyp operand();
 
 
 
@@ -49,8 +49,6 @@ static void operand(void);
 /**********************************************************************/
 /* define tokens + keywords NB: remove this when keytoktab.h is added */
 /**********************************************************************/
-/* enum tvalues { program = 257, id, input, output, var, boolean, integer,*/
-/*	real, begin, end, number };*/
 /**********************************************************************/
 /* Simulate the token stream for a given program                      */
 /**********************************************************************/
@@ -84,7 +82,7 @@ static void match(int t)
 {
     if(DEBUG) printf("\n --------In match expected: %4d, found: %4d",
                     t, lookahead);
-    if (lookahead == t) lookahead = pget_token();
+    if (lookahead == t) lookahead = get_token();
     else {
     is_parse_ok=0;
     printf("\n *** Unexpected Token: expected: %4d found: %4d (in match)",
@@ -130,7 +128,7 @@ static void var_dec_list()
 	{
 		var_dec_list();	
 	}
-	out("var");
+	out("var_dec_list");
 }
 
 static void var_dec()
@@ -202,58 +200,75 @@ static void stat()
 static void assign_stat()
 {
 	in("assign_stat");
-	match(id); match(assign); expr();
+    toktyp type = get_ntype(get_lexeme());
+	match(id); match(assign); 
+    toktyp expr_type = expr();
+    if (type != expr_type)
+        printf("*** Semantic: Assigned type is not similar: %s = %s", 
+                tok2lex(type), tok2lex(expr_type));
 	out("assign_stat");
 }
 
-static void expr()
+static toktyp expr()
 {
     in("expr");
-    term();
+    toktyp left = term();
     if (lookahead == '+')
     {
         match('+');
-        expr();
+        toktyp right = expr();
+        left = get_otype('+', left, right);
     }
     out("expr");
+    return left;
 }
 
-static void term()
+static toktyp term()
 {
     in("term");
-    factor();
+    toktyp left = factor();
     if (lookahead == '*')
     {
         match('*');
-        term();
+        toktyp right = term();
+        left = get_otype('*', left, right);
     }
     out("term");
+    return left;
 }
 
-static void factor()
+static toktyp factor()
 {
     in("factor");
+    toktyp type;
     if (lookahead == '(')
     {
         match('(');
-        expr();
+        type = expr();
         match(')');
     }
     else
     {
-        operand();
+        type = operand();
     }
     out("factor");
+    return type;
 }
 
-static void operand()
+static toktyp operand()
 {
     in("operand");
-    if (lookahead == id)
+    toktyp type;
+    if (lookahead == id) {
+        type = get_ntype(get_lexeme());
         match(id);
-    else
+    }
+    else {
+        type = integer;
         match(number);
+    }
     out("operand");
+    return type;
 }
 
 /**********************************************************************/
@@ -263,7 +278,7 @@ static void operand()
 int parser()
 {
     in("parser");
-    lookahead = pget_token();       // get the first token
+    lookahead = get_token();       // get the first token
     prog();               // call the first grammar rule
     out("parser");
     return is_parse_ok;             // status indicator
