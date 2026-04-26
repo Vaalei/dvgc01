@@ -113,6 +113,10 @@ int get_token()
         while (isalnum(buffer[pbuf])){
             get_char();
         }
+        toktyp t = key2tok(lexbuf);
+        if (t != nfound)
+            return t;
+        return id;
     }
     else if(isdigit(buffer[pbuf])) {
         while (isdigit(buffer[pbuf])) {

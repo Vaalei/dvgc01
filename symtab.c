@@ -88,7 +88,6 @@ static int get_ref(char * fpname)
 {
 	for (int i = 0; i < numrows; i++)
 	{	
-		// printf("\n---- %s\t\t%s", name[i], fpname);
         if (strcmp(get_name(i), fpname) == 0)
             return i;
 	}
@@ -163,7 +162,6 @@ void setv_type(toktyp ftype)
 {
 	int type_ref  = get_ref(tok2lex(ftype));
     int type_size = get_size(type_ref);
-	// printf("\nType size: %d\nType_ref: %d\ntok2lex: %s", type_size, get_ref(), tok2lex(ftype));
     int next_addr = 0;
     for (int i = startp + 1; i < numrows; i++)
         if (get_type(i) != undef)

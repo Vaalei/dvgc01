@@ -33,6 +33,10 @@ static toktyp term();
 static toktyp factor();
 static toktyp operand();
 
+/**********************************************************************/
+/* PRIVATE METHODS for this OBJECT  (using "static" in C)            */
+/**********************************************************************/
+
 static void in(char* s)
 {
     if(DEBUG) printf("\n *** In  %s", s);
@@ -42,6 +46,9 @@ static void out(char* s)
     if(DEBUG) printf("\n *** Out %s", s);
 }
 
+/**********************************************************************/
+/* The Parser functions                                               */
+/**********************************************************************/
 static void match(int t)
 {
     if(DEBUG) printf("\n --------In match expected: %4d, found: %4d", t, lookahead);
@@ -51,13 +58,27 @@ static void match(int t)
     }
     else {
         is_parse_ok=0;
-        printf("\nSYNTAX:   Symbol expected %s found %s ", tok2lex(t), get_lexeme());
+        if (t == id) {
+            printf("\nSYNTAX:   ID expected found %s ", get_lexeme());
+        } else {
+            printf("\nSYNTAX:   Symbol expected %s found %s ", tok2lex(t), get_lexeme());
+        }
     }
 }
+
+/**********************************************************************/
+/* The grammar functions                                              */
+/**********************************************************************/
 
 static void prog()
 {
     in("prog");
+    if (lookahead == '$') {
+        printf("\n SYNTAX:   Input file is empty");
+        is_parse_ok = 0;
+        out("prog");
+        return;
+    }
     program_header();
     var_part();
     stat_part();
@@ -100,11 +121,16 @@ static void var_dec_list()
 static void var_dec()
 {
     in("var_dec");
-    id_list(); 
-    match(':'); 
+    id_list();
+    match(':');
     
-    toktyp declared_type = lookahead; 
-    type(); 
+    toktyp declared_type = error; 
+    
+    if (lookahead == integer || lookahead == real || lookahead == boolean) {
+        declared_type = lookahead;
+    }
+    
+    type();
     setv_type(declared_type);
     
     match(';');
@@ -114,7 +140,6 @@ static void var_dec()
 static void id_list()
 {
     in("id_list");
-    
     if (lookahead == id) {
         char var_name[30];
         strcpy(var_name, get_lexeme());
@@ -126,15 +151,14 @@ static void id_list()
             addv_name(var_name);
         }
     }
-    
     match(id);
-    if(lookahead == ',')
-    {
+    if(lookahead == ',') {
         match(',');
         id_list();
     }
     out("id_list");
 }
+
 
 static void type()
 {
@@ -142,13 +166,20 @@ static void type()
     switch(lookahead)
         {
         case integer:
+            setv_type(integer);
             match(integer);
             break;
         case boolean:
+            setv_type(boolean);
             match(boolean);
             break;
         case real:
+            setv_type(real);
             match(real);
+            break;
+        default:
+            is_parse_ok = 0;
+            printf("\n SYNTAX:   Type name expected found %s", get_lexeme());
             break;
         }
     out("type");
@@ -194,8 +225,9 @@ static void assign_stat()
         if (find_name(var_name) == 0) {
             printf("\nSEMANTIC: ID NOT declared: %s", var_name);
             is_parse_ok = 0;
-            lhs_type = undef;
-        } else {
+            lhs_type = error;
+        }
+        else {
             lhs_type = get_ntype(var_name);
         }
     }
@@ -281,7 +313,6 @@ static toktyp operand()
         match(number);
     }
     else {
-        // Detta är kollen som fångar upp felet i fun3.pas!
         printf("\nSYNTAX:   Operand Expected ");
         is_parse_ok = 0;
         type = error;
@@ -289,7 +320,9 @@ static toktyp operand()
     out("operand");
     return type;
 }
-
+/**********************************************************************/
+/* PUBLIC METHODS for this OBJECT  (EXPORTED)                        */
+/**********************************************************************/
 int parser()
 {
     in("parser");
@@ -297,7 +330,6 @@ int parser()
     prog();                        
     out("parser");
     
-    // Hanterar skräpet som finns kvar på slutet
     if (lookahead != '$') {
         printf("\nSYNTAX:   Extra symbols after end of parse!\n          ");
         while (lookahead != '$') {
@@ -308,7 +340,6 @@ int parser()
         is_parse_ok = 0;
     }
     
-    // Om vi klarade hela testet!
     if (is_parse_ok) {
         printf("\nPARSE SUCCESSFUL! \n");
     }
@@ -317,3 +348,6 @@ int parser()
     
     return is_parse_ok;            
 }
+/**********************************************************************/
+/* End of code                                                        */
+/**********************************************************************/
