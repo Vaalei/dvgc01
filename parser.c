@@ -22,7 +22,7 @@
 /**********************************************************************/
 /* OBJECT ATTRIBUTES FOR THIS OBJECT (C MODULE)                       */
 /**********************************************************************/
-#define DEBUG 1
+#define DEBUG 0
 static int  lookahead=0;
 static int  is_parse_ok=1;
 
@@ -42,27 +42,6 @@ static toktyp term();
 static toktyp factor();
 static toktyp operand();
 
-
-
-/**********************************************************************/
-/* RAPID PROTOTYPING - simulate the token stream & lexer (get_token)  */
-/**********************************************************************/
-/* define tokens + keywords NB: remove this when keytoktab.h is added */
-/**********************************************************************/
-/**********************************************************************/
-/* Simulate the token stream for a given program                      */
-/**********************************************************************/
-static int tokens[] = {program, id, '(', input, ',', output, ')', ';',
-               '$' };
-
-/**********************************************************************/
-/*  Simulate the lexer -- get the next token from the buffer          */
-/**********************************************************************/
-static int pget_token()
-{
-    static int i=0;
-    if (tokens[i] != '$') return tokens[i++]; else return '$';
-}
 
 /**********************************************************************/
 /*  PRIVATE METHODS for this OBJECT  (using "static" in C)            */
@@ -203,9 +182,10 @@ static void assign_stat()
     toktyp type = get_ntype(get_lexeme());
 	match(id); match(assign); 
     toktyp expr_type = expr();
-    if (type != expr_type)
-        printf("*** Semantic: Assigned type is not similar: %s = %s", 
+    if (type != expr_type) {
+        printf("\n*** Semantic: Assigned type is not similar: %s = %s", 
                 tok2lex(type), tok2lex(expr_type));
+    }
 	out("assign_stat");
 }
 
@@ -280,6 +260,7 @@ int parser()
     in("parser");
     lookahead = get_token();       // get the first token
     prog();               // call the first grammar rule
+    p_symtab();
     out("parser");
     return is_parse_ok;             // status indicator
 }
