@@ -15,7 +15,7 @@
 #include "keytoktab.h"          	 /* when the keytoktab is added   */
 #include "lexer.h"       			 /* when the lexer     is added   */
 #include "symtab.h"           		 /* when the symtab    is added   */
-/* #include "optab.h"       */       /* when the optab     is added   */
+#include "optab.h"                   /* when the optab     is added   */
 
 /**********************************************************************/
 /* OBJECT ATTRIBUTES FOR THIS OBJECT (C MODULE)                       */
@@ -47,8 +47,6 @@ static void operand(void);
 /**********************************************************************/
 /* define tokens + keywords NB: remove this when keytoktab.h is added */
 /**********************************************************************/
-/* enum tvalues { program = 257, id, input, output, var, boolean, integer,*/
-/*	real, begin, end, number };*/
 /**********************************************************************/
 /* Simulate the token stream for a given program                      */
 /**********************************************************************/
