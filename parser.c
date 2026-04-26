@@ -12,9 +12,9 @@
 /**********************************************************************/
 /* Other OBJECT's METHODS (IMPORTED)                                  */
 /**********************************************************************/
-#include "keytoktab.h"          /* when the keytoktab is added   */
-/* #include "lexer.h"       */       /* when the lexer     is added   */
-/* #include "symtab.h"      */       /* when the symtab    is added   */
+#include "keytoktab.h"          	 /* when the keytoktab is added   */
+#include "lexer.h"       			 /* when the lexer     is added   */
+#include "symtab.h"           		 /* when the symtab    is added   */
 /* #include "optab.h"       */       /* when the optab     is added   */
 
 /**********************************************************************/
@@ -262,7 +262,7 @@ int parser()
 {
     in("parser");
     lookahead = pget_token();       // get the first token
-    program_header();               // call the first grammar rule
+    prog();               // call the first grammar rule
     out("parser");
     return is_parse_ok;             // status indicator
 }
