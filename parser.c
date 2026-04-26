@@ -85,7 +85,10 @@ static void prog()
 static void program_header()
 {
     in("program_header");
-    match(program); match(id); match('('); match(input);
+    match(program); 
+    addp_name(get_lexeme());
+    match(id); 
+    match('('); match(input);
     match(','); match(output); match(')'); match(';');
     out("program_header");
 }
@@ -120,6 +123,7 @@ static void var_dec()
 static void id_list()
 {
 	in("id_list");
+    addv_name(get_lexeme());
 	match(id);
 	if(lookahead == ',')
 	{
@@ -135,12 +139,15 @@ static void type()
 	switch(lookahead)
 		{
 		case integer:
+            setv_type(integer);
 			match(integer);
 			break;
 		case boolean:
+            setv_type(boolean);
 			match(boolean);
 			break;
 		case real:
+            setv_type(real);
 			match(real);
 			break;
 		}
